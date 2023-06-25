@@ -2,7 +2,7 @@ library(rvest)
 library(dplyr)
 library(stringr)
 
-#Estrutura a lista de cursos
+#Estrutura a lista de cursos (list of courses table structure)
 listaCursos <- tibble() %>% mutate(
   Instituicao = character()
   , Curso = character()
@@ -10,7 +10,7 @@ listaCursos <- tibble() %>% mutate(
   , Modalidade =character()
   , Link = character()
 )
-#Estrutura de grades curriculares
+#Estrutura de grades curriculares (courses curriculum table structure)
 gradeCurricular <- tibble() %>% mutate(
   Instituicao = character()
   , Curso = character()
@@ -19,9 +19,10 @@ gradeCurricular <- tibble() %>% mutate(
   , Materia = character()
 )
 instituicao <- "Mackenzie"
-#Página de cursos de graduação
+#Página de cursos de graduação (university web page)
 url <- "https://www.mackenzie.br/processos-seletivos/vestibular-graduacao/sao-paulo-higienopolis"
 page <- read_html(url)
+#Extrai a lista de cursos (extracts list of courses)
 cursos <- page %>% html_node("#mc-Menus-id56581") %>% html_nodes("h3") %>% html_text()
 niveis <- page %>% html_node("#mc-Menus-id56581") %>% html_nodes("p") %>% html_text() %>%
   gsub("[\r\n]","", .) %>% gsub(" ","", .) %>% gsub("Bacharelado","", .) %>%
@@ -40,12 +41,12 @@ listaCursos <- add_row(listaCursos,
                        )
 listaCursos <- filter(listaCursos, Curso != "Vestibular")
 
-#Faz a extração da grade curricular de cada curso
+#Faz a extração da grade curricular de cada curso (extracts the curriculum of each course)
 listaFiltrada <- filter(listaCursos, Instituicao==instituicao, is.na(Link)==F)
 
 for(i in 1:nrow(listaFiltrada)){
   if (listaFiltrada$Curso[i] == "Ciência da Computação"){
-    #Código exclusivo para Ciência da Computação, que tem diferença da pág. padrão
+    #A página du curso Ciência da Computação é diferente da pág. padrão (Computer science page is different from default page)
     url <- paste("https://www.mackenzie.br", listaFiltrada$Link[i], "/matriz-curricular", sep="")
     page <- read_html(url)
     element <- html_element(page, ".mc-LpCurso-Main-Content") %>%
@@ -71,7 +72,7 @@ for(i in 1:nrow(listaFiltrada)){
     }
   }
   else if (str_detect(listaFiltrada$Curso[i],"Engenharia") == T | listaFiltrada$Curso[i]=="Química"){
-    #Engenharias e Química: objeto materias é diferente
+    #Engenharias e Química: objeto materias é diferente (Engineering and Chemistry curriculum web element is different)
     url <- paste("https://www.mackenzie.br", listaFiltrada$Link[i], "/matriz-curricular", sep="")
     page <- read_html(url)
     id <- html_element(page, ".mc-LpCurso-Main-Content") %>%
@@ -99,6 +100,7 @@ for(i in 1:nrow(listaFiltrada)){
   }
   else
   {
+    #Página padrão - demais cursos (default page for other courses)
     url <- paste("https://www.mackenzie.br", listaFiltrada$Link[i], "/matriz-curricular", sep="")
     page <- read_html(url)
     id <- html_element(page, ".mc-LpCurso-Main-Content") %>%
