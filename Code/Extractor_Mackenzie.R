@@ -40,7 +40,7 @@ listaCursos <- add_row(listaCursos,
                        , Link = links 
                        )
 listaCursos <- filter(listaCursos, Curso != "Vestibular")
-write.csv2(listaCursos, "Reports/ListaCursos.csv", fileEncoding = "UTF-8")
+write.csv2(listaCursos, "Data/Processed/ListaCursos.csv", fileEncoding = "UTF-8")
 
 #Faz a extração da grade curricular de cada curso (extracts the curriculum of each course)
 listaFiltrada <- filter(listaCursos, Instituicao==instituicao, is.na(Link)==F)
@@ -128,4 +128,4 @@ for(i in 1:nrow(listaFiltrada)){
     }
   }
 }
-write.csv2(gradeCurricular, "Reports/GradeCurricular.csv", fileEncoding = "UTF-8")
+write.csv2(gradeCurricular, "Data/Processed/GradeCurricular.csv", fileEncoding = "UTF-8")
